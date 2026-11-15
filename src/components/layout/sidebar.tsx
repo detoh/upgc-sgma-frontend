@@ -8,6 +8,7 @@ import api from '@/lib/api';
 
 const menuItems = [
   { href: '/dashboard', label: 'Tableau de bord', icon: '📊', roles: ['ADMIN', 'GESTIONNAIRE', 'CAISSIER', 'MEMBRE'] },
+  { href: '/dashboard/mon-espace', label: 'Mon Espace', icon: '🏠', roles: ['MEMBRE'] },
   { href: '/dashboard/membres', label: 'Membres', icon: '👥', roles: ['ADMIN', 'GESTIONNAIRE', 'CAISSIER', 'MEMBRE'] },
   { href: '/dashboard/cotisations', label: 'Cotisations', icon: '💰', roles: ['ADMIN', 'GESTIONNAIRE', 'CAISSIER'] },
   { href: '/dashboard/rappels', label: 'Rappels', icon: '🔔', roles: ['ADMIN', 'GESTIONNAIRE', 'CAISSIER'], badgeKey: 'rappels' },

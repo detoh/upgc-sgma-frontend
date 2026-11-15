@@ -8,9 +8,16 @@ interface FamilleFormModalProps {
   onClose: () => void;
   onSuccess: () => void;
   membreId: string | null;
+  forCurrentUser?: boolean; // 🆕 NOUVEAU : true = /me/famille, false = /membres/:id/famille
 }
 
-export default function FamilleFormModal({ isOpen, onClose, onSuccess, membreId }: FamilleFormModalProps) {
+export default function FamilleFormModal({ 
+  isOpen, 
+  onClose, 
+  onSuccess, 
+  membreId,
+  forCurrentUser = false, // 🆕 Par défaut, mode admin
+}: FamilleFormModalProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [formData, setFormData] = useState({
@@ -34,7 +41,12 @@ export default function FamilleFormModal({ isOpen, onClose, onSuccess, membreId 
     setLoading(true);
 
     try {
-      await api.post(`/membres/${membreId}/famille`, formData);
+      // 🆕 URL dynamique selon le contexte
+      const url = forCurrentUser 
+        ? '/membres/me/famille' 
+        : `/membres/${membreId}/famille`;
+      
+      await api.post(url, formData);
       onSuccess();
       onClose();
       setFormData({
@@ -45,7 +57,8 @@ export default function FamilleFormModal({ isOpen, onClose, onSuccess, membreId 
         telephone: '',
       });
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Erreur lors de l\'ajout');
+      const errorMessage = err.response?.data?.message || 'Erreur lors de l\'ajout';
+      setError(Array.isArray(errorMessage) ? errorMessage.join(', ') : errorMessage);
     } finally {
       setLoading(false);
     }

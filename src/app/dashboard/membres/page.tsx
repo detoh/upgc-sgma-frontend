@@ -5,6 +5,7 @@ import api from '@/lib/api';
 import MembreFormModal from '@/components/membres/membre-form-modal';
 import MembreEditModal from '@/components/membres/membre-edit-modal';
 import MembreDetailModal from '@/components/membres/membre-detail-modal';
+import FamilleFormModal from '@/components/membres/famille-form-modal';
 import { toast } from '@/store/toast-store';
 import MemberCardModal from '@/components/membres/member-card-modal';
 import AttestationAdhesionModal from '@/components/membres/attestation-adhesion-modal';
@@ -59,6 +60,8 @@ export default function MembresPage() {
   const [showAttestationModal, setShowAttestationModal] = useState(false);
   const [attestationMembre, setAttestationMembre] = useState<Membre | null>(null);
   const [showImportModal, setShowImportModal] = useState(false);
+  const [showFamilleModal, setShowFamilleModal] = useState(false);
+  const [familleMembreId, setFamilleMembreId] = useState<string | null>(null);
 
   const fetchMembres = async () => {
     setLoading(true);
@@ -406,6 +409,16 @@ export default function MembresPage() {
                           📄
                         </button>
                         <button
+                          onClick={() => {
+                            setFamilleMembreId(membre.id);
+                            setShowFamilleModal(true);
+                          }}
+                          className="text-indigo-600 hover:text-indigo-900"
+                          title="Famille / ayants droit"
+                        >
+                          👨👩‍
+                        </button>
+                        <button
                           onClick={() => handleDelete(membre.id)}
                           className="text-red-600 hover:text-red-900"
                         >
@@ -537,6 +550,12 @@ export default function MembresPage() {
         isOpen={showImportModal}
         onClose={() => setShowImportModal(false)}
         onSuccess={fetchMembres}
+      />
+      <FamilleFormModal
+        isOpen={showFamilleModal}
+        onClose={() => setShowFamilleModal(false)}
+        onSuccess={fetchMembres}
+        membreId={selectedMembreId}
       />
     </div>
   );
