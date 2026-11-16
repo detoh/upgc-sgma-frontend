@@ -42,9 +42,11 @@ export default function Sidebar() {
 
   // 👇 Récupérer les compteurs
   useEffect(() => {
+    // 🛑 STOP : Ne pas charger les compteurs pour les membres
+    if (user?.role === 'MEMBRE') return;
+
     const fetchCounters = async () => {
       try {
-        // Appel parallèle pour plus de rapidité
         const [rappelsRes, prestationsRes] = await Promise.all([
           api.get('/membres/a-relancer', { params: { statut: 'En retard' } }),
           api.get('/prestations/stats'),
@@ -60,12 +62,9 @@ export default function Sidebar() {
     };
 
     fetchCounters();
-    
-    // Actualiser toutes les 60 secondes
     const interval = setInterval(fetchCounters, 60000);
-    
     return () => clearInterval(interval);
-  }, []);
+  }, [user?.role]); // 👈 N'oublie pas d'ajouter user?.role ici
 
   // 👉 Filtre robuste : si user null, on ne montre rien
   const filteredMenuItems = menuItems.filter(item => {

@@ -81,9 +81,35 @@ export default function MonEspacePage() {
   // SITUATION DES COTISATIONS (même logique que la page Membres)
   // ==========================================
   const calculerSituation = (m: Membre) => {
+    // Protection contre les données nulles
+    if (!m || !m.cotisations) {
+      return { 
+        estAJour: false, 
+        statut: 'Non renseigné', 
+        trimestresRequis: 0, 
+        trimestresPayes: 0, 
+        trimestresManquants: 0, 
+        montantDu: 0, 
+        totalPaye: 0 
+      };
+    }
+
     const cotisations = m.cotisations || [];
     const now = new Date();
     const dateAdhesion = new Date(m.dateAdhesion);
+
+    // Vérifier que la date est valide
+    if (isNaN(dateAdhesion.getTime())) {
+      return { 
+        estAJour: false, 
+        statut: 'Date d\'adhésion invalide', 
+        trimestresRequis: 0, 
+        trimestresPayes: 0, 
+        trimestresManquants: 0, 
+        montantDu: 0, 
+        totalPaye: 0 
+      };
+    }
 
     const trimestreActuel = now.getFullYear() * 4 + Math.floor(now.getMonth() / 3) + 1;
     const trimestreAdhesion = dateAdhesion.getFullYear() * 4 + Math.floor(dateAdhesion.getMonth() / 3) + 1;
@@ -132,7 +158,9 @@ export default function MonEspacePage() {
 
   const formatDate = (dateStr?: string) => {
     if (!dateStr) return '-';
-    return new Date(dateStr).toLocaleDateString('fr-FR');
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return '-'; // Date invalide
+    return date.toLocaleDateString('fr-FR');
   };
 
   const formatMontant = (m: number | string) =>
@@ -359,7 +387,7 @@ export default function MonEspacePage() {
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                      {membre.cotisations.map((c) => (
+                      {(membre.cotisations || []).map((c) => (
                         <tr key={c.id} className="hover:bg-gray-50">
                           <Td>{c.periode}</Td>
                           <Td>{c.typeCotisation?.libelle || '-'}</Td>

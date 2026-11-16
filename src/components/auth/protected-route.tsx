@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuthStore } from '@/store/auth-store';
 
@@ -15,8 +15,18 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
   const { user } = useAuthStore();
   const router = useRouter();
   const pathname = usePathname();
+  
+  // 🆕 Astuce pour éviter l'erreur d'hydratation
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    // Ne faire les vérifications de redirection qu'après le montage côté client
+    if (!isMounted) return;
+
     if (!user) {
       router.replace('/login');
       return;
@@ -29,7 +39,16 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
       const home = user.role === 'MEMBRE' ? '/dashboard/mon-espace' : '/dashboard';
       router.replace(home);
     }
-  }, [user, pathname, router]);
+  }, [user, pathname, router, isMounted]);
+
+  // 🆕 Pendant le rendu serveur et le tout premier rendu client, on affiche un chargement cohérent
+  if (!isMounted) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-50">
+        <div className="text-gray-500 font-medium">Chargement de l'espace sécurisé...</div>
+      </div>
+    );
+  }
 
   if (!user) return null;
 

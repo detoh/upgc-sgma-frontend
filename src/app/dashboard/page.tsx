@@ -10,7 +10,8 @@ import {
   GraphiqueTop10Retard,
   GraphiqueRepartitionCotisations,
 } from '@/components/dashboard/charts';
-
+import { useRouter } from 'next/navigation';
+import { useAuthStore } from '@/store/auth-store';
 interface DashboardData {
   totalMembres: number;
   membresActifs: number;
@@ -36,8 +37,11 @@ export default function DashboardPage() {
   const [data, setData] = useState<DashboardData | null>(null);
 
   useEffect(() => {
-    fetchDashboardData();
-  }, []);
+    if (user?.role === 'MEMBRE') {
+      router.replace('/dashboard/mon-espace');
+      return;
+    }
+  }, [user, router]);
 
   const fetchDashboardData = async () => {
     setLoading(true);
