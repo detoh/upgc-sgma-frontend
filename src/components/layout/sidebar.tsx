@@ -7,19 +7,27 @@ import { useAuthStore } from '@/store/auth-store';
 import api from '@/lib/api';
 
 const menuItems = [
-  { href: '/dashboard', label: 'Tableau de bord', icon: '📊', roles: ['ADMIN', 'GESTIONNAIRE', 'CAISSIER', 'MEMBRE'] },
+  // 🏠 Mon Espace - MEMBRE uniquement
   { href: '/dashboard/mon-espace', label: 'Mon Espace', icon: '🏠', roles: ['MEMBRE'] },
-  { href: '/dashboard/membres', label: 'Membres', icon: '👥', roles: ['ADMIN', 'GESTIONNAIRE', 'CAISSIER', 'MEMBRE'] },
+  
+  // 📈 Dashboard - ADMIN/GESTIONNAIRE/CAISSIER uniquement
+  { href: '/dashboard', label: 'Tableau de bord', icon: '📈', roles: ['ADMIN', 'GESTIONNAIRE', 'CAISSIER'] },
+  
+  // 👥 Membres - ADMIN/GESTIONNAIRE/CAISSIER uniquement
+  { href: '/dashboard/membres', label: 'Membres', icon: '👥', roles: ['ADMIN', 'GESTIONNAIRE', 'CAISSIER'] },
+  
   { href: '/dashboard/cotisations', label: 'Cotisations', icon: '💰', roles: ['ADMIN', 'GESTIONNAIRE', 'CAISSIER'] },
   { href: '/dashboard/rappels', label: 'Rappels', icon: '🔔', roles: ['ADMIN', 'GESTIONNAIRE', 'CAISSIER'], badgeKey: 'rappels' },
-  { href: '/dashboard/prestations', label: 'Prestations', icon: '🏥', roles: ['ADMIN', 'GESTIONNAIRE', 'MEMBRE'], badgeKey: 'prestations' },
-  { href: '/dashboard/activites', label: 'Activités', icon: '📈', roles: ['ADMIN', 'GESTIONNAIRE'] },
+  { href: '/dashboard/prestations', label: 'Prestations', icon: '🏥', roles: ['ADMIN', 'GESTIONNAIRE'], badgeKey: 'prestations' },
+  { href: '/dashboard/activites', label: 'Activités', icon: '📅', roles: ['ADMIN', 'GESTIONNAIRE'] },
   { href: '/dashboard/dons', label: 'Dons', icon: '💝', roles: ['ADMIN', 'GESTIONNAIRE', 'CAISSIER'] },
-  { href: '/dashboard/rapports', label: 'Rapports', icon: '📋', roles: ['ADMIN', 'GESTIONNAIRE'] },
+  { href: '/dashboard/rapports', label: 'Rapports', icon: '📊', roles: ['ADMIN', 'GESTIONNAIRE'] },
   { href: '/dashboard/rapports/etats-paiements', label: 'État Paiements', icon: '📄', roles: ['ADMIN', 'GESTIONNAIRE'] },
   { href: '/dashboard/utilisateurs', label: 'Utilisateurs', icon: '👤', roles: ['ADMIN'] },
-  { href: '/dashboard/profil', label: 'Mon profil', icon: '👤', roles: ['ADMIN', 'GESTIONNAIRE', 'CAISSIER', 'MEMBRE'] },
   { href: '/dashboard/parametres', label: 'Paramètres', icon: '⚙️', roles: ['ADMIN'] },
+  
+  // 👤 Profil - tous les rôles
+  { href: '/dashboard/profil', label: 'Mon profil', icon: '👤', roles: ['ADMIN', 'GESTIONNAIRE', 'CAISSIER', 'MEMBRE'] },
 ];
 
 export default function Sidebar() {
