@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import api from '@/lib/api';
 import { toast } from '@/store/toast-store';
+import { useRouter } from 'next/navigation';        
+import { useAuthStore } from '@/store/auth-store';
 import Link from 'next/link';
 import {
   GraphiqueRepartition,
@@ -10,8 +12,6 @@ import {
   GraphiqueTop10Retard,
   GraphiqueRepartitionCotisations,
 } from '@/components/dashboard/charts';
-import { useRouter } from 'next/navigation';
-import { useAuthStore } from '@/store/auth-store';
 interface DashboardData {
   totalMembres: number;
   membresActifs: number;
@@ -35,6 +35,8 @@ interface DashboardData {
 export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<DashboardData | null>(null);
+  const { user } = useAuthStore();
+  const router = useRouter();
 
   useEffect(() => {
     if (user?.role === 'MEMBRE') {
@@ -43,7 +45,10 @@ export default function DashboardPage() {
     }
   }, [user, router]);
 
+  
+
   const fetchDashboardData = async () => {
+    if (user?.role === 'MEMBRE') return;
     setLoading(true);
     try {
       const response = await api.get('/dashboard/resume');
