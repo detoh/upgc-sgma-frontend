@@ -13,7 +13,7 @@ const nextConfig = {
 
   allowedDevOrigins: [
     'http://localhost:3001',
-    'http://192.168.1.131:3001',
+    'http://192.168.1.154:3001',
     'https://spindle-other-impotency.ngrok-free.dev',
   ],
 };
