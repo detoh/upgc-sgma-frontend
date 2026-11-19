@@ -9,14 +9,31 @@ const roleRoutes: Record<string, string[]> = {
   CAISSIER: ['/dashboard', '/dashboard/membres', '/dashboard/cotisations', '/dashboard/rappels', '/dashboard/dons', '/dashboard/profil'],
   GESTIONNAIRE: ['/dashboard', '/dashboard/membres', '/dashboard/cotisations', '/dashboard/rappels', '/dashboard/prestations', '/dashboard/activites', '/dashboard/dons', '/dashboard/rapports', '/dashboard/rapports/etats-paiements', '/dashboard/profil'],
   ADMIN: ['/dashboard', '/dashboard/membres', '/dashboard/cotisations', '/dashboard/rappels', '/dashboard/prestations', '/dashboard/activites', '/dashboard/dons', '/dashboard/rapports', '/dashboard/rapports/etats-paiements', '/dashboard/utilisateurs', '/dashboard/parametres', '/dashboard/profil'],
+  // 🆕 SUPER_ADMIN a accès à TOUT (hérite des droits ADMIN + privilèges système)
+  SUPER_ADMIN: [
+    '/dashboard',
+    '/dashboard/membres',
+    '/dashboard/cotisations',
+    '/dashboard/rappels',
+    '/dashboard/prestations',
+    '/dashboard/activites',
+    '/dashboard/dons',
+    '/dashboard/rapports',
+    '/dashboard/rapports/etats-paiements',
+    '/dashboard/utilisateurs',
+    '/dashboard/parametres',
+    '/dashboard/profil',
+    // Routes futures SaaS Phase 2+
+    '/dashboard/organisations',
+    '/dashboard/super-admin',
+  ],
 };
 
 export default function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user } = useAuthStore();
   const router = useRouter();
   const pathname = usePathname();
-  
-  // 🆕 Astuce pour éviter l'erreur d'hydratation
+
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
@@ -24,7 +41,6 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
   }, []);
 
   useEffect(() => {
-    // Ne faire les vérifications de redirection qu'après le montage côté client
     if (!isMounted) return;
 
     if (!user) {
@@ -41,7 +57,6 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
     }
   }, [user, pathname, router, isMounted]);
 
-  // 🆕 Pendant le rendu serveur et le tout premier rendu client, on affiche un chargement cohérent
   if (!isMounted) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50">

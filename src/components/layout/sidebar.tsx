@@ -20,44 +20,41 @@ export default function Sidebar() {
   const router = useRouter();
   const [counters, setCounters] = useState({ rappels: 0, prestations: 0 });
 
-  // 🛑 GARDE AU TOUT DÉBUT : Si MEMBRE, on ne charge RIEN du tout
-  const isMembre = user?.role === 'MEMBRE';
-
   useEffect(() => {
-    // Si l'utilisateur est MEMBRE, on ne lance AUCUN appel
-    if (!user || isMembre) return;
-
     const fetchCounters = async () => {
-      // Double-vérification de sécurité (au cas où le rôle change)
       const currentRole = useAuthStore.getState().user?.role;
-      if (!currentRole || currentRole === 'MEMBRE') return;
+      console.log("👀 [DEBUG SIDEBAR] Rôle détecté:", currentRole);
+      
+      if (!currentRole || currentRole === 'MEMBRE') {
+        console.log("🛑 [DEBUG SIDEBAR] BLOQUÉ (MEMBRE ou null). Aucun appel API.");
+        return;
+      }
 
+      console.log("🟢 [DEBUG SIDEBAR] AUTORISÉ. Chargement des compteurs...");
       try {
         const [rappelsRes, prestationsRes] = await Promise.all([
           api.get('/membres/a-relancer', { params: { statut: 'En retard' } }),
           api.get('/prestations/stats'),
         ]);
-
         setCounters({
           rappels: rappelsRes.data.length || 0,
           prestations: prestationsRes.data.enAttente || 0,
         });
       } catch (error) {
-        // Silencieux : on ne pollue pas la console
+        console.error("❌ [DEBUG SIDEBAR] Erreur API:", error);
       }
     };
 
     fetchCounters();
     const interval = setInterval(fetchCounters, 60000);
     return () => clearInterval(interval);
-  }, [user, isMembre]);
+  }, [user]);
 
   const handleLogout = () => {
     logout();
     router.push('/login');
   };
 
-  // Menu pour les rôles ADMIN / GESTIONNAIRE / CAISSIER
   const menuItems: MenuItem[] = [
     {
       label: 'Tableau de bord',
@@ -121,10 +118,6 @@ export default function Sidebar() {
       icon: <span>⚙️</span>,
       roles: ['ADMIN'],
     },
-  ];
-
-  // Menu pour les MEMBRES (très restreint)
-  const membreMenuItems: MenuItem[] = [
     {
       label: 'Mon Espace',
       href: '/dashboard/mon-espace',
@@ -139,9 +132,10 @@ export default function Sidebar() {
     },
   ];
 
-  const itemsToDisplay = isMembre ? membreMenuItems : menuItems;
-  const filteredItems = itemsToDisplay.filter(
-    (item) => !item.roles || (user && item.roles.includes(user.role))
+  const filteredItems = menuItems.filter(
+    (item) =>
+      !item.roles ||
+      (user && (user.role === 'SUPER_ADMIN' || item.roles.includes(user.role)))
   );
 
   return (

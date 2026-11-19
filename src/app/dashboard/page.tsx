@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import api from '@/lib/api';
 import { toast } from '@/store/toast-store';
-import { useRouter } from 'next/navigation';        
+import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/auth-store';
 import Link from 'next/link';
 import {
@@ -12,6 +12,7 @@ import {
   GraphiqueTop10Retard,
   GraphiqueRepartitionCotisations,
 } from '@/components/dashboard/charts';
+
 interface DashboardData {
   totalMembres: number;
   membresActifs: number;
@@ -38,15 +39,6 @@ export default function DashboardPage() {
   const { user } = useAuthStore();
   const router = useRouter();
 
-  useEffect(() => {
-    if (user?.role === 'MEMBRE') {
-      router.replace('/dashboard/mon-espace');
-      return;
-    }
-  }, [user, router]);
-
-  
-
   const fetchDashboardData = async () => {
     if (user?.role === 'MEMBRE') return;
     setLoading(true);
@@ -69,12 +61,23 @@ export default function DashboardPage() {
 
       setData(dashboardData);
     } catch (error) {
-      console.error('Erreur:', error);
+      console.error('Erreur dashboard:', error);
       toast.error('Erreur', 'Impossible de charger les données du dashboard');
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (!user) return;
+
+    if (user.role === 'MEMBRE') {
+      router.replace('/dashboard/mon-espace');
+      return;
+    }
+
+    fetchDashboardData();
+  }, [user, router]);
 
   if (loading) {
     return (
@@ -124,9 +127,9 @@ export default function DashboardPage() {
             <div className="text-4xl">👥</div>
           </div>
           <div className="mt-4 flex items-center text-sm">
-            <span className="text-green-600">● {data.membresActifs} actifs</span>
+            <span className="text-green-600">✓ {data.membresActifs} actifs</span>
             <span className="mx-2 text-gray-300">|</span>
-            <span className="text-red-600">● {data.membresRadie} radiés</span>
+            <span className="text-red-600">✓ {data.membresRadie} radiés</span>
           </div>
         </div>
 
